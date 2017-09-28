@@ -4,9 +4,10 @@
 
 from Robinhood import Robinhood
 import mysql.connector
-from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 import time
+import sys
 from datetime import datetime, timedelta
 
 class stock_sql_driver:
@@ -27,7 +28,7 @@ class stock_sql_driver:
 		cursor = conn.cursor()
 		for i in range(len(data)):
 			if (data[i][1] == None):
-				print data[i][0]
+				print ("No data for: data[i][0]")
 				continue
 			sql_string = "INSERT INTO snapshots (stockKey, targetDateTime, stockAskPrice, stockAskSize, stockBidPrice, stockLastTradePrice, stockPreviousClosePrice, stockPreviousCloseDate, stockTradingHalted, stockHasTraded, stockLastTradePriceSource) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');".format(data[i][0],target_date,data[i][1]['ask_price'],data[i][1]['ask_size'],data[i][1]['bid_price'],data[i][1]['bid_size'],data[i][1]['last_trade_price'],data[i][1]['previous_close'],data[i][1]['previous_close_date'],data[i][1]['trading_halted'],data[i][1]['has_traded'],data[i][1]['last_trade_price_source'])
 			cursor.execute(sql_string)
@@ -38,21 +39,28 @@ def snap(target_date):
 	snap.driver.take_snapshot(target_date)
 snap.driver = stock_sql_driver()
 
-def plan_day():
+def plan_day(sched):
 	t = datetime.today()
-
-	#do no schedule snapshots for weekends
-	if (t.weekday() >= 5): return
-	
-	sched = BlockingScheduler()
-
-	first_time = datetime(t.year,t.month,t.day,8)
+	print("Planning day for ", t)
+	first_time = datetime(t.year,t.month,t.day,9,30)
 	delta = timedelta(minutes = 0)
-	for i in range(108):
+	
+	#schedule a snapshot for every 5 minutes between 9:30 and 4:00
+	for i in range(78):
 		sched.add_job(snap, 'date', run_date=(first_time + delta), args=[(first_time+delta)])
 		delta += timedelta(minutes = 5)
+
+def run():
+	print("Begin saving stocks...")
+	logging.basicConfig()
+
+	sched = BackgroundScheduler()
+	#run schedule daily jobs everyweek day at 8
+	sched.add_job(plan_day, 'cron', day_of_week='0-4', hour='8', args=[sched])
 	sched.start()
 
-logging.basicConfig()
-plan_day()
+	while True:
+		sys.stdout.flush()
+		time.sleep(60)
 
+run()
