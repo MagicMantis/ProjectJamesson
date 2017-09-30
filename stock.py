@@ -99,10 +99,6 @@ class Runner:
 	def __del__(self):
 		self.sched.shutdown()
 
-	# global function for taking snapshots with static reference to stock_sql_driver
-	def snap(self, target_date):
-		self.driver.take_snapshot(target_date)
-
 	# schedule all jobs for the current day
 	def plan_day(self):
 
@@ -116,8 +112,9 @@ class Runner:
 		self.driver.update_stock_list()	
 
 		# schedule a snapshot for every 5 minutes between 9:30 and 4:00
-		for i in range(78):
-			self.sched.add_job(self.snap, 'date', run_date=(first_time + delta), args=[(first_time+delta)])
+		for i in range(300):
+			self.sched.add_job(self.driver.take_snapshot, 'date', 
+				run_date=(first_time + delta), args=[(first_time+delta)])
 			delta += timedelta(minutes = 5)
 
 Runner()
