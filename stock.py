@@ -12,9 +12,6 @@ from datetime import datetime, timedelta
 
 class StockDriver:
 
-	def __init__(self):
-		self.update_stock_list()
-
 	# open connection to the database
 	def connect_to_db(self):
 		conn = mysql.connector.connect(
@@ -112,7 +109,7 @@ class Runner:
 		self.driver.update_stock_list()	
 
 		# schedule a snapshot for every 5 minutes between 9:30 and 4:00
-		for i in range(300):
+		for i in range(78):
 			self.sched.add_job(self.driver.take_snapshot, 'date', 
 				run_date=(first_time + delta), args=[(first_time+delta)])
 			delta += timedelta(minutes = 5)
