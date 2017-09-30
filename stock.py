@@ -104,7 +104,7 @@ class Runner:
 
 		# setup variables to do time calculations
 		t = datetime.today()
-		print("Planning day for ", t)
+		print "Planning day for ", t
 		first_time = datetime(t.year,t.month,t.day,9,30)
 		delta = timedelta(minutes = 0)
 
