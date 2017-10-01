@@ -1,7 +1,4 @@
 Project Roadmap:
-- Set the project up to run automatically everyday
-	* setup init.d script
-- Create interface for buying, selling, balance, cash robot
 - Give robot a brain (neural network)
 	* define inputs
 	* define outputs
@@ -23,3 +20,5 @@ Completed
 - Switch scheduler to Background and clean up times
 - Make it try to run plan_day() at startup in case of restart
 - Make stock_sql_driver get stock list from stocks table instead of hard-coded
+- Set the project up to run automatically everyday
+- Create interface for buying, selling, balance, cash robot
