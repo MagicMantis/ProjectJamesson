@@ -1,9 +1,7 @@
 Project Roadmap:
 - Give robot a brain (neural network)
-	* define inputs
-	* define outputs
-	* create 1000 randomly named robots and assign random weights
-	* simulate on a day and take scores for each
+	- Define initial inputs
+	- Define initial outputs
 - Use genetic algorithm to improve population each day
 
 Bonus:
@@ -22,3 +20,5 @@ Completed
 - Make stock_sql_driver get stock list from stocks table instead of hard-coded
 - Set the project up to run automatically everyday
 - Create interface for buying, selling, balance, cash robot
+- Create simulator that simulates a robot buying and selling stocks
+- Fix sql query to include bid size

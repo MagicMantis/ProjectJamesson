@@ -11,8 +11,8 @@ class StockDriver:
 	# open connection to the database
 	def connect_to_db(self):
 		conn = mysql.connector.connect(
-			user = 'root', 
-			password='f9nuF66m+', 
+			user = 'python', 
+			password='PyPass999!', 
 			unix_socket='/var/run/mysqld/mysqld.sock', 
 			database='stock_info'
 		)
@@ -72,9 +72,9 @@ class StockDriver:
 				print ("No data for: data[i][0]")
 				continue
 			sql_string = ("INSERT INTO snapshots (stockKey, targetDateTime, stockAskPrice, stockAskSize, " + 
-				"stockBidPrice, stockLastTradePrice, stockPreviousClosePrice, stockPreviousCloseDate, " + 
+				"stockBidPrice, stockBidSize, stockLastTradePrice, stockPreviousClosePrice, stockPreviousCloseDate, " + 
 				"stockTradingHalted, stockHasTraded, stockLastTradePriceSource) VALUES ('{0}', '{1}', " + 
-				"'{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');")
+				"'{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}');")
 			sql_string = sql_string.format(data[i][0],target_date,data[i][1]['ask_price'],
 				data[i][1]['ask_size'],data[i][1]['bid_price'],data[i][1]['bid_size'],
 				data[i][1]['last_trade_price'],data[i][1]['previous_close'],
