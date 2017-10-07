@@ -63,6 +63,29 @@ class Genome:
 		self.globalRank
 		self.mutationProfile = MutationProfile()
 
+	def isSameSpecies(self, other):
+
+		dd = DeltaDisjoint * self.disjoints(other)
+		dw = DeltaWeight * self.weights(other)
+		return dd + dw < DeltaThreshhold
+
+	def disjoints(self, other):
+		
+		set1 = set(self.genes)
+		set2 = set(other.genes)
+		return len(set1 ^ set2) / max(len(set1), len(set2))
+
+	def weights(self, other):
+
+		sum = 0
+		coincident = 0
+		for innovation, gene in self.genes:
+			if innovation in other.genes:
+				sum += abs(gene.weight - other.genes[innovation].weight)
+				coincident += 1
+
+		return sum / coincident
+		
 
 class MutationProfile:
 
@@ -86,6 +109,7 @@ class Species:
 		self.genomes = []
 		self.average_fitness = 0
 
+
 class Pool:
 
 	def __init__(self):
@@ -103,4 +127,13 @@ class Pool:
 
 		for i in range(self.population):
 			genome = Genome()
-			self.species.append()
+			genome.maxneuron = Inputs
+			genome.mutate()
+			self.add_to_species(genome)
+	
+	def add_to_species(self, new_genome):
+
+		for species in self.species:
+			if species.genomes[0].isSameSpecies(new_genome):
+				species.addGenome(new_genome)
+
