@@ -23,6 +23,18 @@ class Mutator:
         self.step_size = StepSize
         random.seed(time.time())
 
+	def copy(self):
+
+		new_mutator = Mutator()
+		new_mutator.mutate_connections_chance = self.mutate_connections_chance
+		new_mutator.link_mutation_chance = self.link_mutation_chance
+		new_mutator.bias_mutation_chance = self.bias_mutation_chance
+		new_mutator.node_mutation_chance = self.node_mutation_chance
+		new_mutator.enable_chance = self.enable_chance
+		new_mutator.disable_chance = self.disable_chance
+
+		return new_mutator
+
     @staticmethod
     def random(x):
         random.randint(x)

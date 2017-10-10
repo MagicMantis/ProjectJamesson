@@ -22,3 +22,13 @@ class Gene:
 
     def isEnabled(self):
         return self.enabled
+
+	def copy(self):
+
+		new_gene = Gene()
+		new_gene.into = self.into
+		new_gene.out = self.out
+		new_gene.weight = self.weight
+		new_gene.enabled = self.enabled
+		new_gene.innovation = self.innovation
+		return new_gene

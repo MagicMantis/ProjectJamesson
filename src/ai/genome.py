@@ -58,4 +58,36 @@ class Genome:
             else:
                 child.genes.append(gene.copy())
 
+		child.mutator = self.mutator.copy()
+
         return child
+
+	def random_neuron(self, non_input):
+
+		options = set()
+
+		if not non_input:
+			for i in range(self.input_size): options.add(i)
+
+		for i in range(MaxNodes, MaxNodes+self.output_size):
+			options.add(i)
+
+		for gene in self.genes:
+			if not non_input or gene.into > self.input_size:
+				options.add(gene.into)
+			if not non_input or gene.out > self.input_size:
+				options.add(gene.out)
+
+		return random.choice(options)
+
+	def copy(self):
+
+		new_genome = Genome()
+		for gene in self.genes:
+			new_genome.genes.append(gene.copy())
+	
+		new_genome.input_size = self.input_size
+		new_genome.output_size = self.output_size
+		new_genome.mutator = self.mutator.copy()
+
+		return new_genome
