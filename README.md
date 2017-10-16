@@ -1,7 +1,5 @@
 Project Roadmap:
-- Give robot a brain (neural network)
-	- Define initial inputs
-	- Define initial outputs
+- Fix (allow negative outputs (why is it only positive))
 - Use genetic algorithm to improve population each day
 
 Bonus:
@@ -22,3 +20,6 @@ Completed
 - Create interface for buying, selling, balance, cash robot
 - Create simulator that simulates a robot buying and selling stocks
 - Fix sql query to include bid size
+- Give robot a brain (neural network)
+	- Define initial inputs
+	- Define initial outputs
