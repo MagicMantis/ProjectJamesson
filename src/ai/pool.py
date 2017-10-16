@@ -1,7 +1,10 @@
 
 from src.ai.genome import Genome
 
+Inputs = 100 * 5
+
 class Pool:
+
     def __init__(self):
 
         self.species = []
@@ -17,7 +20,7 @@ class Pool:
 
         for i in range(self.population):
             genome = Genome()
-            genome.maxneuron = Inputs
+            genome.max_neuron = Inputs
             genome.mutate()
             self.add_to_species(genome)
 
@@ -26,3 +29,15 @@ class Pool:
         for species in self.species:
             if species.genomes[0].isSameSpecies(new_genome):
                 species.addGenome(new_genome)
+
+    def rank_globally(self):
+
+        ranked = []
+        for species in self.species:
+            for genome in species.genomes:
+                ranked.append(genome)
+
+        ranked.sort(self, lambda x: x.fitness, reverse=True)
+
+        for rank, genome in enumerate(ranked):
+            genome.global_rank = rank

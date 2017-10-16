@@ -1,5 +1,7 @@
 # unit representing a link between neurons that can be active in a given genome
 class Gene:
+    Innovation = 0
+
     def __init__(self):
         # start and end neurons for this connections
         self.into = 0
@@ -20,15 +22,22 @@ class Gene:
     def disable(self):
         self.enabled = False
 
-    def isEnabled(self):
+    def toggle(self):
+        self.enabled = not self.enabled
+
+    def is_enabled(self):
         return self.enabled
 
-	def copy(self):
+    def copy(self):
+        new_gene = Gene()
+        new_gene.into = self.into
+        new_gene.out = self.out
+        new_gene.weight = self.weight
+        new_gene.enabled = self.enabled
+        new_gene.innovation = self.innovation
+        return new_gene
 
-		new_gene = Gene()
-		new_gene.into = self.into
-		new_gene.out = self.out
-		new_gene.weight = self.weight
-		new_gene.enabled = self.enabled
-		new_gene.innovation = self.innovation
-		return new_gene
+    @staticmethod
+    def innovate():
+        Gene.Innovation += 1
+        return Gene.innovation

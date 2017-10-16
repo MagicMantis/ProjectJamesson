@@ -2,9 +2,11 @@ from src.ai.neuron import Neuron
 from src.ai.genome import Genome
 import math
 
-MaxNodes = 10000
 
 class Network:
+
+    MaxNodes = 10000
+
     def __init__(self, genome):
         self.genome = genome
         self.neurons = {}
@@ -32,8 +34,10 @@ class Network:
             if val > 0: neuron.value = self.sigmoid(val)
 
         outputs = []
-        for i in range(MaxNodes, MaxNodes + self.genome.output_size):
+        for i in range(Network.MaxNodes, Network.MaxNodes + self.genome.output_size):
             outputs.append(self.neurons[i].value)
+
+        return outputs
 
     @staticmethod
     def sigmoid(x):

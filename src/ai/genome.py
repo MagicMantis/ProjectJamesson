@@ -1,5 +1,6 @@
 from src.ai.mutator import Mutator
 from src.ai.network import Network
+import random
 
 Population = 300
 DeltaDisjoint = 2.0
@@ -15,9 +16,10 @@ class Genome:
         self.adjustedFitness = 0
         self.input_size = 0
         self.output_size = 0
-        self.globalRank = 0
+        self.max_neuron = 0
+        self.global_rank = 0
         self.network = None
-        self.mutator = Mutator()
+        self.mutator = Mutator(self)
 
     def is_same_species(self, other):
 
@@ -49,45 +51,54 @@ class Genome:
         child = Genome()
 
         innovations_other = {}
-        for gene in other.genes: innovations_other[gene.innovation] = gene
+        for gene in other.genes:
+            innovations_other[gene.innovation] = gene
 
         for gene in self.genes:
             other_gene = innovations_other[gene.innovation]
-            if other_gene and other_gene.enabled and self.mutator.random(2) == 1:
+            if other_gene and other_gene.enabled and random.randint(2) == 1:
                 child.genes.append(other_gene.copy())
             else:
                 child.genes.append(gene.copy())
 
-		child.mutator = self.mutator.copy()
+        child.max_neuron = max(self.max_neuron, other.max_neuron)
+        child.mutator = self.mutator.copy(self)
 
         return child
 
-	def random_neuron(self, non_input):
+    def random_neuron(self, non_input):
 
-		options = set()
+        options = set()
 
-		if not non_input:
-			for i in range(self.input_size): options.add(i)
+        if not non_input:
+            for i in range(self.input_size): options.add(i)
 
-		for i in range(MaxNodes, MaxNodes+self.output_size):
-			options.add(i)
+        for i in range(Network.MaxNodes, Network.MaxNodes + self.output_size):
+            options.add(i)
 
-		for gene in self.genes:
-			if not non_input or gene.into > self.input_size:
-				options.add(gene.into)
-			if not non_input or gene.out > self.input_size:
-				options.add(gene.out)
+        for gene in self.genes:
+            if not non_input or gene.into > self.input_size:
+                options.add(gene.into)
+            if not non_input or gene.out > self.input_size:
+                options.add(gene.out)
 
-		return random.choice(options)
+        return random.choice(options)
 
-	def copy(self):
+    def contains_link(self, link):
 
-		new_genome = Genome()
-		for gene in self.genes:
-			new_genome.genes.append(gene.copy())
-	
-		new_genome.input_size = self.input_size
-		new_genome.output_size = self.output_size
-		new_genome.mutator = self.mutator.copy()
+        for gene in self.genes:
+            if gene.into == link.into and gene.out == link.out:
+                return True
 
-		return new_genome
+    def copy(self):
+
+        new_genome = Genome()
+        for gene in self.genes:
+            new_genome.genes.append(gene.copy())
+
+        new_genome.input_size = self.input_size
+        new_genome.output_size = self.output_size
+        new_genome.max_neuron = self.max_neuron
+        new_genome.mutator = self.mutator.copy(self)
+
+        return new_genome
