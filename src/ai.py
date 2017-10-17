@@ -4,7 +4,7 @@ import time
 
 
 class Pool:
-    Inputs = 2
+    Inputs = 3
     Outputs = 1
     MaxStaleness = 15
 
@@ -35,7 +35,7 @@ class Pool:
 
         for species in self.species:
             if species.genomes[0].is_same_species(new_genome):
-                species.add_genome(new_genome)
+                species.genomes.append(new_genome)
                 return
 
         new_species = Species()
@@ -182,6 +182,8 @@ class Genome:
 
         set1 = set(self.genes)
         set2 = set(other.genes)
+        if not max(len(set1), len(set2)):
+            return 0
         return len(set1 ^ set2) / max(len(set1), len(set2))
 
     def weights(self, other):
@@ -208,7 +210,9 @@ class Genome:
             innovations_other[gene.innovation] = gene
 
         for gene in self.genes:
-            other_gene = innovations_other[gene.innovation]
+            other_gene = None
+            if gene.innovation in innovations_other:
+                other_gene = innovations_other[gene.innovation]
             if other_gene and other_gene.enabled and random.randint(0, 1) == 1:
                 child.genes.append(other_gene.copy())
             else:
@@ -286,7 +290,6 @@ class Mutator:
         random.seed(time.time())
 
     def mutate(self):
-
         self.rate_mutate()
         if random.random() < self.mutate_connections_chance:
             self.point_mutate()
@@ -336,8 +339,10 @@ class Mutator:
     def link_mutate(self, force_bias):
         n1 = self.genome.random_neuron(False)
         n2 = self.genome.random_neuron(True)
-        if n1 < self.genome.input_size and n2 < self.genome.input_size:
+        if n1 == n2 or n2 < self.genome.input_size:
             return
+        if n2 < n1:
+            n1, n2 = n2, n1
 
         new_link = Gene()
         new_link.into = n1
@@ -448,7 +453,7 @@ class Network:
         for i in range(Network.MaxNodes, Network.MaxNodes + self.genome.output_size):
             self.neurons[i] = Neuron()
 
-        for gene in sorted(genome.genes, key=lambda x: x.out, reverse=True):
+        for gene in sorted(genome.genes, key=lambda x: x.out):
             if gene.enabled:
                 if gene.out not in self.neurons:
                     self.neurons[gene.out] = Neuron()
@@ -456,20 +461,27 @@ class Network:
                 if gene.into not in self.neurons:
                     self.neurons[gene.into] = Neuron()
 
-    def evaluate(self, inputs):
+    def evaluate(self, inputs, debug=False):
+        inputs.append(1)
 
         if len(inputs) != self.genome.input_size:
-            print("Incorrect number of inputs: ", len(inputs), "; expected ", self.genome.input_size)
+            if debug: print("Incorrect number of inputs: ", len(inputs), "; expected ", self.genome.input_size)
             return []
 
         for i in range(len(inputs)):
             self.neurons[i].value = inputs[i]
 
-        for neuron in self.neurons.values():
-            val = sum(x.weight * self.neurons[x.into].value for x in neuron.incoming)
+        for i, neuron in self.neurons.items():
+            if i < self.genome.input_size:
+                continue
+            if debug: print(i, list(x.into for x in neuron.incoming))
+            if not neuron.incoming:
+                continue
+            val = sum(x.weight * self.neurons[x.into].value for x in neuron.incoming) / len(neuron.incoming)
+            if debug: print(list((x.into, self.neurons[x.into].value) for x in neuron.incoming))
+            if debug: print(list(x.weight for x in neuron.incoming))
 
-            if val > 0:
-                neuron.value = self.sigmoid(val)
+            neuron.value = self.sigmoid(val)
 
         outputs = []
         for i in range(Network.MaxNodes, Network.MaxNodes + self.genome.output_size):

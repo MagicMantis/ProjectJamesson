@@ -13,9 +13,10 @@ random.seed(time.time())
 
 pool = Pool()
 pool.basic_generation()
+max_genome = None
 
 thing = []
-for i in range(1):
+for i in range(20):
     for species in pool.species:
         for genome in species.genomes:
             n = Network(genome)
@@ -24,16 +25,20 @@ for i in range(1):
             results = []
             fs = []
             for i in range(len(inputs)):
-                results.append(abs(n.evaluate(inputs[i])[0] - targets[i]))
-                fs.append(n.evaluate(inputs[i])[0])
+                results.append(abs(n.evaluate(inputs[i][:])[0] - targets[i]))
+                fs.append(n.evaluate(inputs[i][:])[0])
             fitness = 2 - sum(results) / len(results)
             print(results, " Stuff: ", fs, "Fitness: ", fitness)
             genome.fitness = fitness
             if fitness > pool.max_fitness:
                 pool.max_fitness = fitness
-                genome.display()
+                max_genome = genome
     thing.append(pool.max_fitness)
     pool.new_generation()
 print(thing)
 
-print(Network.sigmoid(2), Network.sigmoid(1), Network.sigmoid(0), Network.sigmoid(-1), Network.sigmoid(-2))
+#print("")
+#Network(max_genome).evaluate([-1,-1], True)
+#print("")
+#max_genome.display()
+# print("")
