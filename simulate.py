@@ -109,6 +109,8 @@ class Simulator:
                 robot.genome.fitness = float(robot.balance)
                 total += [(robot.name, robot.balance)]
             total.sort(key=lambda x: x[1])
+            # Testing value
+            best_was = total[-1][0]
 
             self.pool.new_generation()
             new_genomes = self.pool.all_genomes()
@@ -117,8 +119,33 @@ class Simulator:
                 robot.reset()
                 robot.genome = new_genomes[i]
 
+        # ------------------------------------
+        # Testing
+        self.current_datetime = datetime(today.year, today.month, today.day, 9, 30)
+        self.current_datetime -= timedelta(days=4)
+        self.get_stock_data()
+        self.current_datetime += timedelta(hours=1, minutes=5)
+
+        while self.current_datetime.time() < time(16):
+            self.update_inputs()
+            for robot in self.robot_list:
+                robot.simulate(self.stock_list)
+
+            self.current_datetime += timedelta(minutes=5)
+
+        total = []
+        for robot in self.robot_list:
+            robot.display()
+            robot.genome.fitness = float(robot.balance)
+            total += [(robot.name, robot.balance)]
+        total.sort(key=lambda x: x[1])
+
+        # ------------------------------------
+
         for i in total:
             print(i)
+        # Testing value
+        print(best_was)
 
     def get_inputs(self):
         return self.inputs[:]
