@@ -86,19 +86,19 @@ class Robot:
         positions = []
         for stock in stock_list:
             price = self.simulator.get_bid_price(stock)
-            positions.append( price / self.balance )
-        positions.append( self.cash / self.balance )
+            positions.append(float(price / self.balance))
+        positions.append(float(self.cash / self.balance))
         return positions
 
     def simulate(self, stock_list):
 
         inputs = self.simulator.get_inputs()
-        print(inputs)
         inputs += self.get_positions(stock_list)
         network = self.genome.generate_network()
         outputs = network.evaluate(inputs, True)
-        print(outputs)
 
         for i, stock in enumerate(stock_list):
-            if outputs[i] < 0: self.sell(stock, 1)
-            if outputs[i] > 0: self.buy(stock, 1)
+            if outputs[i] < 0:
+                self.sell(stock, 1)
+            if outputs[i] > 0:
+                self.buy(stock, 1)

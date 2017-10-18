@@ -70,14 +70,14 @@ class Simulator:
         self.clean_data()
 
     def clean_data(self):
-        last_time = self.current_datetime
-        clean_time = last_time + timedelta(minutes=5)
         for stock in self.stock_data:
+            last_time = self.current_datetime
+            clean_time = last_time + timedelta(minutes=5)
             while clean_time.time() < time(16):
                 last_price = self.stock_data[stock][last_time.time()][3]
                 price = self.stock_data[stock][clean_time.time()][3]
                 delta = price - last_price
-                self.stock_data_clean[stock][clean_time] = delta / last_price
+                self.stock_data_clean[stock][clean_time.time()] = delta / last_price
                 last_time = clean_time
                 clean_time += timedelta(minutes=5)
 
@@ -102,14 +102,14 @@ class Simulator:
             print(i)
 
     def get_inputs(self):
-        return self.inputs
+        return self.inputs[:]
 
     def update_inputs(self):
         self.inputs = []
-        quicktime = self.current_datetime - timedelta(hours=1)
+        quick_time = self.current_datetime - timedelta(hours=1)
         for stock in self.stock_list:
             for _ in range(12):
-                self.inputs.append(self.stock_data_clean[stock][quicktime.time()])
+                self.inputs.append(float(self.stock_data_clean[stock][quick_time.time()]))
 
     def get_stock_info(self, stock):
 
