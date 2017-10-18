@@ -4,33 +4,49 @@
 
 from collections import defaultdict
 from datetime import date, time, datetime, timedelta
+import csv
+import random
 
 from src.stock import StockDriver
 from src.robot import Robot
+from src.ai import Pool
 
 
 class Simulator:
     def __init__(self):
 
-        self.robot_list = []
+        # Get date and time information
         today = date.today()
         self.current_datetime = datetime(today.year, today.month, today.day, 9, 30)
 
+        # Define subset of stocks to use for simulation
         self.stock_list_string = "('NVDA', 'ABBV', 'DISCA')"
         self.stock_list = ['NVDA', 'ABBV', 'DISCA']
         self.stock_data = defaultdict(lambda: {})
         self.driver = StockDriver()
 
+        # Get stock data for the day
         self.get_stock_data()
+        
+        # Get names for robots
+        with open("res/names.csv", "r") as namefile:
+            name_reader = csv.reader(namefile, delimiter=',')
+            self.names = [x[0] for x in list(name_reader)]
 
-        for i in range(100):
-            self.add_robot("robot" + str(i))
+        # Create pool of species of robot brains
+        self.pool = Pool()
+        self.pool.basic_generation()
+
+        # Create robot bodies for brains
+        self.robot_list = []
+        for i, genome in enumerate(self.pool.all_genomes()):
+            self.add_robot(random.choice(self.names)+str(i), genome)
 
         self.simulate()
 
-    def add_robot(self, name="Robot"):
+    def add_robot(self, name="Robot", genome):
 
-        self.robot_list.append(Robot(self, name))
+        self.robot_list.append(Robot(self, name, genome))
 
     def set_datetime(self, datetime):
 

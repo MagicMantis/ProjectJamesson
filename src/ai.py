@@ -129,6 +129,12 @@ class Pool:
         print("Avg fitness: ", sum(species.average_fitness for species in self.species) / len(self.species), "\n")
 
 
+    def all_genomes(self):
+        genome_list = []
+        for species in self.species:
+            genome_list += species.genomes
+        return genome_list
+
 class Species:
     CrossoverChance = config['MUTATION'].getfloat('crossover_chance')
 

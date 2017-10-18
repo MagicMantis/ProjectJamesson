@@ -1,6 +1,9 @@
 Project Roadmap:
-- Fix (allow negative outputs (why is it only positive))
-- Use genetic algorithm to improve population each day
+- Optimize Genetic Algorithm functions
+- Put brain in robot body
+	* fix inputs
+	* fix buy and sell based on output
+- Get inputs for a small subset of stocks (~5)
 
 Bonus:
 - Add visualization on website
@@ -23,3 +26,6 @@ Completed
 - Give robot a brain (neural network)
 	- Define initial inputs
 	- Define initial outputs
+- Fixed cannot be negative
+- Use genetic algorithm to improve population each day
+

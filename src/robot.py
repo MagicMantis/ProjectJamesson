@@ -5,16 +5,18 @@
 from collections import defaultdict
 import random
 import time
+from src.ai import Genome
 
 
 class Robot:
-    def __init__(self, simulator, name="Robot"):
+    def __init__(self, simulator, name="Robot", genome):
         self.simulator = simulator
         self.name = name
         self.balance = 1000
         self.original_balance = self.balance
         self.cash = self.balance
         self.stocks = defaultdict(lambda: 0)
+		self.genome = genome
 
         random.seed(time.time())
 
@@ -76,9 +78,11 @@ class Robot:
         for stock in self.stocks:
             print("\t{}: {}".format(stock, self.stocks[stock]))
 
-    def simulate(self, stock_list):
+    def simulate(self, stock_list, inputs):
 
-        for stock in stock_list:
-            amt = random.randint(-2, 2)
-            if amt < -1: self.sell(stock, 1)
-            if amt > 1: self.buy(stock, 1)
+        network = genome.generate_network()
+        outputs = network.evaluate(inputs)
+
+        for i, stock in enumerate(stock_list):
+            if output[i] < 0: self.sell(stock, 1)
+            if output[i] > 0: self.buy(stock, 1)
