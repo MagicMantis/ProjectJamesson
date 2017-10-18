@@ -2,7 +2,6 @@ from src.ai import Genome
 from src.ai import Network
 from src.ai import Pool
 
-import configparser
 import random
 import time
 
@@ -29,7 +28,7 @@ for i in range(20):
                 results.append(abs(n.evaluate(inputs[i][:])[0] - targets[i])**2)
                 fs.append(n.evaluate(inputs[i][:])[0])
             fitness = 1 - sum(results) / len(results)
-            # print(results, " Stuff: ", fs, "Fitness: ", fitness)
+            print(results, " Stuff: ", fs, "Fitness: ", fitness)
             genome.fitness = fitness
             if fitness > pool.max_fitness:
                 pool.max_fitness = fitness

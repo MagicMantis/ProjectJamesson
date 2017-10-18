@@ -1,23 +1,24 @@
 import math
 import random
 import time
+import configparser
 
+config = configparser.ConfigParser()
+config.read('res/config.ini')
 
 class Pool:
-    Inputs = 3
-    Outputs = 1
-    MaxStaleness = 15
 
     def __init__(self):
 
         self.species = []
-        self.population = 100
+        self.population = config['POPULATION'].getint('size')
         self.generation = 0
         self.innovation = 0
         self.current_species = 1
         self.current_genome = 1
         self.current_frame = 0
         self.max_fitness = 0
+        self.max_staleness = config['POPULATION'].getint('max_staleness')
 
     def basic_generation(self):
 
@@ -25,7 +26,7 @@ class Pool:
 
         for i in range(self.population):
             genome = Genome()
-            genome.max_neuron = Pool.Inputs
+            genome.max_neuron = Network.InputSize
             genome.mutator.mutate()
             self.add_to_species(genome)
 
@@ -76,7 +77,7 @@ class Pool:
             else:
                 species.staleness += 1
 
-            if species.staleness < Pool.MaxStaleness or species.top_fitness >= self.max_fitness:
+            if species.staleness < self.max_staleness or species.top_fitness >= self.max_fitness:
                 survived.append(species)
 
         self.species = survived
@@ -129,7 +130,7 @@ class Pool:
 
 
 class Species:
-    CrossoverChance = 0.9
+    CrossoverChance = config['MUTATION'].getfloat('crossover_chance')
 
     def __init__(self):
         self.top_fitness = 0
@@ -155,18 +156,17 @@ class Species:
 
 
 class Genome:
-    Population = 300
-    DeltaDisjoint = 2.0
-    DeltaWeights = 0.4
-    DeltaThreshold = 1.0
+    DeltaDisjoint = config['POPULATION'].getfloat('delta_disjoint')
+    DeltaWeights = config['POPULATION'].getfloat('delta_weights')
+    DeltaThreshold = config['POPULATION'].getfloat('delta_threshhold')
 
     def __init__(self):
 
         self.genes = []
         self.fitness = 0
         self.adjustedFitness = 0
-        self.input_size = Pool.Inputs
-        self.output_size = Pool.Outputs
+        self.input_size = Network.InputSize
+        self.output_size = Network.OutputSize
         self.max_neuron = 0
         self.global_rank = 0
         self.network = None
@@ -268,15 +268,15 @@ class Genome:
 
 
 class Mutator:
-    PerturbChance = 0.90
-    MutateConnectionsChance = 0.25
-    CrossoverChance = 0.75
-    LinkMutationChance = 2.0
-    NodeMutationChance = 0.50
-    BiasMutationChance = 0.40
-    EnableMutationChance = 0.2
-    DisableMutationChance = 0.4
-    StepSize = 0.1
+    PerturbChance = config['MUTATION'].getfloat('perturb_chance')
+    MutateConnectionsChance = config['MUTATION'].getfloat('mutate_connections_chance')
+    CrossoverChance = config['MUTATION'].getfloat('crossover_chance')
+    LinkMutationChance = config['MUTATION'].getfloat('link_mutation_chance')
+    NodeMutationChance = config['MUTATION'].getfloat('node_mutation_chance')
+    BiasMutationChance = config['MUTATION'].getfloat('bias_mutation_chance')
+    EnableMutationChance = config['MUTATION'].getfloat('enable_mutation_chance')
+    DisableMutationChance = config['MUTATION'].getfloat('disable_mutation_chance')
+    StepSize = config['MUTATION'].getfloat('step_size')
 
     def __init__(self, genome):
         self.genome = genome
@@ -441,7 +441,9 @@ class Mutator:
 
 
 class Network:
-    MaxNodes = 10000
+    InputSize = config['NETWORK'].getint('inputs')
+    OutputSize = config['NETWORK'].getint('outputs')
+    MaxNodes = config['NETWORK'].getint('max_nodes')
 
     def __init__(self, genome):
         self.genome = genome
@@ -477,7 +479,7 @@ class Network:
             if debug: print(i, list(x.into for x in neuron.incoming))
             if not neuron.incoming:
                 continue
-            val = sum(x.weight * self.neurons[x.into].value for x in neuron.incoming) / len(neuron.incoming)
+            val = sum(x.weight * self.neurons[x.into].value for x in neuron.incoming)
             if debug: print(list((x.into, self.neurons[x.into].value) for x in neuron.incoming))
             if debug: print(list(x.weight for x in neuron.incoming))
 
@@ -487,6 +489,7 @@ class Network:
         for i in range(Network.MaxNodes, Network.MaxNodes + self.genome.output_size):
             outputs.append(self.neurons[i].value)
 
+        if debug: print("values:", list((i,x.value) for i,x in self.neurons.items()))
         return outputs
 
     @staticmethod
