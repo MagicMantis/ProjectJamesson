@@ -5,6 +5,7 @@
 from collections import defaultdict
 import random
 import time
+from decimal import *
 from src.ai import Genome
 
 
@@ -12,7 +13,7 @@ class Robot:
     def __init__(self, simulator, genome, name="Robot"):
         self.simulator = simulator
         self.name = name
-        self.balance = 1000
+        self.balance = Decimal(1000.00)
         self.original_balance = self.balance
         self.cash = self.balance
         self.stocks = defaultdict(lambda: 0)
@@ -78,12 +79,26 @@ class Robot:
         for stock in self.stocks:
             print("\t{}: {}".format(stock, self.stocks[stock]))
 
+    def get_positions(self, stock_list):
+        # Update balance for accurate calculation of positions
+        self.update_balance()
+
+        positions = []
+        for stock in stock_list:
+            price = self.simulator.get_bid_price(stock)
+            positions.append( price / self.balance )
+        positions.append( self.cash / self.balance )
+        return positions
+
     def simulate(self, stock_list):
 
         inputs = self.simulator.get_inputs()
-        network = genome.generate_network()
-        outputs = network.evaluate(inputs)
+        print(inputs)
+        inputs += self.get_positions(stock_list)
+        network = self.genome.generate_network()
+        outputs = network.evaluate(inputs, True)
+        print(outputs)
 
         for i, stock in enumerate(stock_list):
-            if output[i] < 0: self.sell(stock, 1)
-            if output[i] > 0: self.buy(stock, 1)
+            if outputs[i] < 0: self.sell(stock, 1)
+            if outputs[i] > 0: self.buy(stock, 1)

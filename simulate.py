@@ -41,7 +41,7 @@ class Simulator:
         # Create robot bodies for brains
         self.robot_list = []
         for i, genome in enumerate(self.pool.all_genomes()):
-            self.add_robot(random.choice(self.names)+str(i), genome)
+            self.add_robot(genome, random.choice(self.names)+str(i))
 
         self.simulate()
 
@@ -74,7 +74,6 @@ class Simulator:
         for stock in self.stock_data:
             while cleantime.time() < time(16):
                 last_price = self.stock_data[stock][lasttime.time()][3]
-                print(last_price)
                 price = self.stock_data[stock][cleantime.time()][3]
                 delta = price - last_price
                 self.stock_data_clean[stock][cleantime] = delta / last_price
@@ -83,7 +82,10 @@ class Simulator:
 
     def simulate(self):
 
+        self.current_datetime += timedelta(hours = 1, minutes = 5)
+
         while self.current_datetime.time() < time(16):
+            self.update_inputs()
             for robot in self.robot_list:
                 robot.simulate(self.stock_list)
 
@@ -97,6 +99,16 @@ class Simulator:
 
         for i in total:
             print(i)
+
+    def get_inputs(self):
+        return self.inputs
+    
+    def update_inputs(self):
+        self.inputs = []
+        quicktime = self.current_datetime - timedelta(hours = 1)
+        for stock in self.stock_list:
+            for _ in range(12):
+                self.inputs.append(self.stock_data_clean[stock][quicktime.time()])
 
     def get_stock_info(self, stock):
 

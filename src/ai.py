@@ -207,6 +207,7 @@ class Genome:
 
     def generate_network(self):
         self.network = Network(self)
+        return self.network
 
     def crossover(self, other):
         child = Genome()
