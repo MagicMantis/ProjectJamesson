@@ -80,6 +80,7 @@ class Simulator:
             clean_time = last_time + timedelta(minutes=5)
             while clean_time.time() < time(16):
                 last_price = self.stock_data[stock][last_time.time()][3]
+                print(stock, self.stock_data[stock].keys())
                 price = self.stock_data[stock][clean_time.time()][3]
                 delta = price - last_price
                 self.stock_data_clean[stock][clean_time.time()] = delta / last_price
@@ -122,7 +123,7 @@ class Simulator:
         # ------------------------------------
         # Testing
         self.current_datetime = datetime(today.year, today.month, today.day, 9, 30)
-        self.current_datetime -= timedelta(days=4)
+        self.current_datetime -= timedelta(days=1)
         self.get_stock_data()
         self.current_datetime += timedelta(hours=1, minutes=5)
 
