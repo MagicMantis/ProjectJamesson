@@ -164,7 +164,7 @@ class Species:
 class Genome:
     DeltaDisjoint = config['POPULATION'].getfloat('delta_disjoint')
     DeltaWeights = config['POPULATION'].getfloat('delta_weights')
-    DeltaThreshold = config['POPULATION'].getfloat('delta_threshhold')
+    DeltaThreshold = config['POPULATION'].getfloat('delta_threshold')
 
     def __init__(self):
 

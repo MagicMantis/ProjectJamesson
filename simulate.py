@@ -25,10 +25,11 @@ class Simulator:
         self.stock_data = defaultdict(lambda: {})
         self.stock_data_clean = defaultdict(lambda: {})
         self.driver = StockDriver()
+        self.inputs = []
 
         # Get stock data for the day
         self.get_stock_data()
-        
+
         # Get names for robots
         with open("res/names.csv", "r") as namefile:
             name_reader = csv.reader(namefile, delimiter=',')
@@ -41,7 +42,7 @@ class Simulator:
         # Create robot bodies for brains
         self.robot_list = []
         for i, genome in enumerate(self.pool.all_genomes()):
-            self.add_robot(genome, random.choice(self.names)+str(i))
+            self.add_robot(genome, random.choice(self.names) + str(i))
 
         self.simulate()
 
@@ -49,9 +50,9 @@ class Simulator:
 
         self.robot_list.append(Robot(self, genome, name))
 
-    def set_datetime(self, datetime):
+    def set_datetime(self, current_datetime):
 
-        self.current_datetime = datetime
+        self.current_datetime = current_datetime
 
     def get_stock_data(self):
 
@@ -69,20 +70,20 @@ class Simulator:
         self.clean_data()
 
     def clean_data(self):
-        lasttime = self.current_datetime
-        cleantime = lasttime+timedelta(minutes=5)
+        last_time = self.current_datetime
+        clean_time = last_time + timedelta(minutes=5)
         for stock in self.stock_data:
-            while cleantime.time() < time(16):
-                last_price = self.stock_data[stock][lasttime.time()][3]
-                price = self.stock_data[stock][cleantime.time()][3]
+            while clean_time.time() < time(16):
+                last_price = self.stock_data[stock][last_time.time()][3]
+                price = self.stock_data[stock][clean_time.time()][3]
                 delta = price - last_price
-                self.stock_data_clean[stock][cleantime] = delta / last_price
-                lasttime = cleantime
-                cleantime += timedelta(minutes=5)
+                self.stock_data_clean[stock][clean_time] = delta / last_price
+                last_time = clean_time
+                clean_time += timedelta(minutes=5)
 
     def simulate(self):
 
-        self.current_datetime += timedelta(hours = 1, minutes = 5)
+        self.current_datetime += timedelta(hours=1, minutes=5)
 
         while self.current_datetime.time() < time(16):
             self.update_inputs()
@@ -102,10 +103,10 @@ class Simulator:
 
     def get_inputs(self):
         return self.inputs
-    
+
     def update_inputs(self):
         self.inputs = []
-        quicktime = self.current_datetime - timedelta(hours = 1)
+        quicktime = self.current_datetime - timedelta(hours=1)
         for stock in self.stock_list:
             for _ in range(12):
                 self.inputs.append(self.stock_data_clean[stock][quicktime.time()])

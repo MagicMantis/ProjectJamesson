@@ -4,19 +4,23 @@
 
 from Robinhood import Robinhood
 import mysql.connector
-from datetime import datetime
+import configparser
 
 
 class StockDriver:
     def __init__(self):
         self.stock_list = []
+        self.config = configparser.ConfigParser()
+        self.config.read("res/config.ini")
 
     # open connection to the database
     def connect_to_db(self):
         conn = mysql.connector.connect(
-            user='python',
-            password='PyPass999!',
-            unix_socket='/var/run/mysqld/mysqld.sock',
+            user=self.config['DATABASE']['user'],
+            password=self.config['DATABASE']['password'],
+            host=self.config['DATABASE']['host'],
+            port=self.config['DATABASE']['port'],
+            unix_socket=self.config['DATABASE']['socket'],
             database='stock_info'
         )
         return conn
@@ -74,7 +78,7 @@ class StockDriver:
         conn = self.connect_to_db()
         cursor = conn.cursor()
         for i in range(len(data)):
-            if (data[i][1] == None):
+            if data[i][1] == None:
                 print("No data for: data[i][0]")
                 continue
             sql_string = ("INSERT INTO snapshots (stockKey, targetDateTime, stockAskPrice, stockAskSize, " +
