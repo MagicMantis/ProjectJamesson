@@ -9,14 +9,14 @@ from src.ai import Genome
 
 
 class Robot:
-    def __init__(self, simulator, name="Robot", genome):
+    def __init__(self, simulator, genome, name="Robot"):
         self.simulator = simulator
         self.name = name
         self.balance = 1000
         self.original_balance = self.balance
         self.cash = self.balance
         self.stocks = defaultdict(lambda: 0)
-		self.genome = genome
+        self.genome = genome
 
         random.seed(time.time())
 
@@ -78,8 +78,9 @@ class Robot:
         for stock in self.stocks:
             print("\t{}: {}".format(stock, self.stocks[stock]))
 
-    def simulate(self, stock_list, inputs):
+    def simulate(self, stock_list):
 
+        inputs = self.simulator.get_inputs()
         network = genome.generate_network()
         outputs = network.evaluate(inputs)
 

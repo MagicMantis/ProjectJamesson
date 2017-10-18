@@ -23,6 +23,7 @@ class Simulator:
         self.stock_list_string = "('NVDA', 'ABBV', 'DISCA')"
         self.stock_list = ['NVDA', 'ABBV', 'DISCA']
         self.stock_data = defaultdict(lambda: {})
+        self.stock_data_clean = defaultdict(lambda: {})
         self.driver = StockDriver()
 
         # Get stock data for the day
@@ -44,9 +45,9 @@ class Simulator:
 
         self.simulate()
 
-    def add_robot(self, name="Robot", genome):
+    def add_robot(self, genome, name="Robot"):
 
-        self.robot_list.append(Robot(self, name, genome))
+        self.robot_list.append(Robot(self, genome, name))
 
     def set_datetime(self, datetime):
 
@@ -64,6 +65,21 @@ class Simulator:
         conn.close()
         for result in results:
             self.stock_data[result[2]][result[1].time()] = result
+
+        self.clean_data()
+
+    def clean_data(self):
+        lasttime = self.current_datetime
+        cleantime = lasttime+timedelta(minutes=5)
+        for stock in self.stock_data:
+            while cleantime.time() < time(16):
+                last_price = self.stock_data[stock][lasttime.time()][3]
+                print(last_price)
+                price = self.stock_data[stock][cleantime.time()][3]
+                delta = price - last_price
+                self.stock_data_clean[stock][cleantime] = delta / last_price
+                lasttime = cleantime
+                cleantime += timedelta(minutes=5)
 
     def simulate(self):
 
