@@ -7,6 +7,7 @@ from datetime import date, time, datetime, timedelta
 import csv
 import random
 
+from src.config import Config
 from src.stock import StockDriver
 from src.robot import Robot
 from src.ai import Pool
@@ -18,6 +19,10 @@ class Simulator:
         # Get date and time information
         today = date.today()
         self.current_datetime = datetime(today.year, today.month, today.day, 9, 30)
+        random.seed(datetime.now())
+
+        # Load config file
+        self.config = Config.get_config()
 
         # Define subset of stocks to use for simulation
         self.stock_list_string = "('NVDA', 'ABBV', 'DISCA')"
@@ -83,20 +88,34 @@ class Simulator:
 
     def simulate(self):
 
-        self.current_datetime += timedelta(hours=1, minutes=5)
-
-        while self.current_datetime.time() < time(16):
-            self.update_inputs()
-            for robot in self.robot_list:
-                robot.simulate(self.stock_list)
-
-            self.current_datetime += timedelta(minutes=5)
-
         total = []
-        for robot in self.robot_list:
-            robot.display()
-            total += [robot.calculate_change()]
-        total.sort()
+
+        for generation in range(7):
+            # TO-DO: remove this duplicate code
+            today = date.today()
+            self.current_datetime = datetime(today.year, today.month, today.day, 9, 30)
+            self.current_datetime += timedelta(hours=1, minutes=5)
+
+            while self.current_datetime.time() < time(16):
+                self.update_inputs()
+                for robot in self.robot_list:
+                    robot.simulate(self.stock_list)
+
+                self.current_datetime += timedelta(minutes=5)
+
+            total = []
+            for robot in self.robot_list:
+                robot.display()
+                robot.genome.fitness = float(robot.balance)
+                total += [(robot.name, robot.balance)]
+            total.sort(key=lambda x: x[1])
+
+            self.pool.new_generation()
+            new_genomes = self.pool.all_genomes()
+            for i in range(len(self.robot_list)):
+                robot = self.robot_list[i]
+                robot.reset()
+                robot.genome = new_genomes[i]
 
         for i in total:
             print(i)

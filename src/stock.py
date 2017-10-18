@@ -3,15 +3,14 @@
 # Collects stock info and saves to database, acts as primary interface for the database
 
 from Robinhood import Robinhood
+from src.config import Config
 import mysql.connector
-import configparser
 
 
 class StockDriver:
     def __init__(self):
         self.stock_list = []
-        self.config = configparser.ConfigParser()
-        self.config.read("res/config.ini")
+        self.config = Config.get_config()
 
     # open connection to the database
     def connect_to_db(self):

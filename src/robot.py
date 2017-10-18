@@ -7,19 +7,23 @@ import random
 import time
 from decimal import *
 from src.ai import Genome
-
+import configparser
 
 class Robot:
     def __init__(self, simulator, genome, name="Robot"):
         self.simulator = simulator
         self.name = name
-        self.balance = Decimal(1000.00)
+        self.balance = Decimal(self.simulator.config['STOCK']['start_balance'])
         self.original_balance = self.balance
         self.cash = self.balance
         self.stocks = defaultdict(lambda: 0)
         self.genome = genome
 
-        random.seed(time.time())
+    def reset(self):
+        self.balance = self.original_balance
+        self.cash = self.balance
+        self.stocks = defaultdict(lambda: 0)
+        self.genome = None
 
     # buy as many shares of stock as can afford up to amount
     def buy(self, stock, amount):

@@ -3,11 +3,12 @@ import random
 import time
 import configparser
 
-config = configparser.ConfigParser()
-config.read('res/config.ini')
+from src.config import Config
+
+config = Config.get_config()
+
 
 class Pool:
-
     def __init__(self):
 
         self.species = []
@@ -128,12 +129,12 @@ class Pool:
         print("Max fitness: ", self.max_fitness)
         print("Avg fitness: ", sum(species.average_fitness for species in self.species) / len(self.species), "\n")
 
-
     def all_genomes(self):
         genome_list = []
         for species in self.species:
             genome_list += species.genomes
         return genome_list
+
 
 class Species:
     CrossoverChance = config['MUTATION'].getfloat('crossover_chance')
@@ -496,7 +497,7 @@ class Network:
         for i in range(Network.MaxNodes, Network.MaxNodes + self.genome.output_size):
             outputs.append(self.neurons[i].value)
 
-        if debug: print("values:", list((i,x.value) for i,x in self.neurons.items()))
+        if debug: print("values:", list((i, x.value) for i, x in self.neurons.items()))
         return outputs
 
     @staticmethod
@@ -544,7 +545,7 @@ class Gene:
         return new_gene
 
     def display(self):
-        print("Gene ", self.into, " -> ", self.out,"(", self.weight, ")")
+        print("Gene ", self.into, " -> ", self.out, "(", self.weight, ")")
 
     @staticmethod
     def innovate():
