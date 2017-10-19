@@ -73,7 +73,7 @@ class StockDriver:
 
     # take the data from all stocks in stock_list at the specified datetime
     def take_snapshot(self, target_date):
-        data = self.get_stock_info()
+        data = list(self.get_stock_info())
         conn = self.connect_to_db()
         cursor = conn.cursor()
         for i in range(len(data)):

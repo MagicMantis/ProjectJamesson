@@ -21,7 +21,7 @@ class Runner:
         self.sched = BackgroundScheduler()
 
         # run schedule daily jobs every weekday at 8
-        self.sched.add_job(self.plan_day, 'cron', day_of_week='0-4', hour='8', args=[])
+        self.sched.add_job(self.plan_day, 'cron', day_of_week='0-4', hour='8', args=[], misfire_grace_time=60*60)  
         self.sched.start()
 
         # run plan day to catch any remaining (in case of late start)
@@ -53,8 +53,8 @@ class Runner:
         # schedule a snapshot for every 5 minutes between 9:30 and 4:00
         for i in range(78):
             self.sched.add_job(self.driver.take_snapshot, 'date',
-                               run_date=(first_time + delta), args=[(first_time + delta)])
+                               run_date=(first_time + delta), args=[(first_time + delta)],
+                               misfire_grace_time=60, max_instances=3)
             delta += timedelta(minutes=5)
-
 
 Runner()
