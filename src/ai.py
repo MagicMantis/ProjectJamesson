@@ -474,9 +474,9 @@ class Network:
             if gene.enabled:
                 if gene.out not in self.neurons:
                     self.neurons[gene.out] = Neuron()
-                self.neurons[gene.out].incoming.append(gene)
                 if gene.into not in self.neurons:
                     self.neurons[gene.into] = Neuron()
+                self.neurons[gene.out].incoming.append((gene.weight, self.neurons[gene.into]))
 
     def evaluate(self, inputs, debug=False):
         inputs.append(1)
@@ -492,7 +492,7 @@ class Network:
             if i < self.genome.input_size:
                 continue
             if debug: print(i, list(x.into for x in neuron.incoming))
-            val = sum(x.weight * self.neurons[x.into].value for x in neuron.incoming)
+            val = sum(weight * node.value for weight,node in neuron.incoming)
             if debug: print(list((x.into, self.neurons[x.into].value) for x in neuron.incoming))
             if debug: print(list(x.weight for x in neuron.incoming))
 

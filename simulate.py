@@ -18,7 +18,7 @@ class Simulator:
 
         # Get date and time information
         today = date.today()
-        self.current_datetime = datetime(today.year, today.month, today.day, 9, 30)
+        self.current_datetime = datetime(today.year, today.month, today.day-1, 9, 30)
         random.seed(datetime.now())
 
         # Load config file
