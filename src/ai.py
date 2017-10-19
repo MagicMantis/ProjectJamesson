@@ -94,8 +94,21 @@ class Pool:
 
         self.species = survived
 
-    def new_generation(self):
+    def generation_stats(self):
 
+        for species in self.species:
+            species.calculate_average_fitness()
+        self.max_fitness = max(x.fitness for x in self.all_genomes())
+
+        print("\nGeneration ", self.generation, " stats: ")
+        print("Species Count: ", len(self.species))
+        print("Population: ", sum(len(species.genomes) for species in self.species))
+        print("Max fitness: ", self.max_fitness)
+        print("Avg fitness: ", sum(species.average_fitness for species in self.species) / len(self.species), "\n")
+
+
+    def new_generation(self):
+        
         self.cull_species(False)
         for species in self.species:
             species.calculate_average_fitness()
@@ -122,12 +135,6 @@ class Pool:
             self.add_to_species(child)
 
         self.generation += 1
-
-        print("Generation ", self.generation, " stats: ")
-        print("Species Count: ", len(self.species))
-        print("Population: ", sum(len(species.genomes) for species in self.species))
-        print("Max fitness: ", self.max_fitness)
-        print("Avg fitness: ", sum(species.average_fitness for species in self.species) / len(self.species), "\n")
 
     def all_genomes(self):
         genome_list = []
@@ -485,8 +492,6 @@ class Network:
             if i < self.genome.input_size:
                 continue
             if debug: print(i, list(x.into for x in neuron.incoming))
-            if not neuron.incoming:
-                continue
             val = sum(x.weight * self.neurons[x.into].value for x in neuron.incoming)
             if debug: print(list((x.into, self.neurons[x.into].value) for x in neuron.incoming))
             if debug: print(list(x.weight for x in neuron.incoming))

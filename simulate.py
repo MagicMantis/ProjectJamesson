@@ -80,7 +80,6 @@ class Simulator:
             clean_time = last_time + timedelta(minutes=5)
             while clean_time.time() < time(16):
                 last_price = self.stock_data[stock][last_time.time()][3]
-                print(stock, self.stock_data[stock].keys())
                 price = self.stock_data[stock][clean_time.time()][3]
                 delta = price - last_price
                 self.stock_data_clean[stock][clean_time.time()] = delta / last_price
@@ -91,7 +90,7 @@ class Simulator:
 
         total = []
 
-        for generation in range(7):
+        for generation in range(Config.get_config()['POPULATION'].getint('generations')):
             # TO-DO: remove this duplicate code
             today = date.today()
             self.current_datetime = datetime(today.year, today.month, today.day, 9, 30)
@@ -113,6 +112,7 @@ class Simulator:
             # Testing value
             best_was = total[-1][0]
 
+            self.pool.generation_stats()
             self.pool.new_generation()
             new_genomes = self.pool.all_genomes()
             for i in range(len(self.robot_list)):
@@ -136,13 +136,14 @@ class Simulator:
 
         total = []
         for robot in self.robot_list:
-            robot.display()
+            #robot.display()
             robot.genome.fitness = float(robot.balance)
             total += [(robot.name, robot.balance)]
         total.sort(key=lambda x: x[1])
 
         # ------------------------------------
 
+        self.pool.generation_stats()
         for i in total:
             print(i)
         # Testing value

@@ -1,5 +1,6 @@
 Project Roadmap:
-- Optimize Genetic Algorithm functions
+- Optimize Genetic Algorithm functions (current 25%)
+- Optimize Network evaluation (current 75%)
 - Put brain in robot body
 	* fix inputs
 	* fix buy and sell based on output

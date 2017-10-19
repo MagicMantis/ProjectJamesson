@@ -7,7 +7,7 @@ import random
 import time
 from decimal import *
 from src.ai import Genome
-import configparser
+from src.config import Config
 
 class Robot:
     def __init__(self, simulator, genome, name="Robot"):
@@ -32,11 +32,12 @@ class Robot:
         price = self.simulator.get_ask_price(stock)
 
         # determine total price and buyability
-        while amount * price > self.balance:
+        while amount * price > self.cash:
             amount -= 1
 
         # buy stocks
-        print("Buying {} shares of {} for {} each, total {}".format(amount, stock, price, price * amount))
+        if Config.is_debug_mode():
+            print("Buying {} shares of {} for {} each, total {}".format(amount, stock, price, price * amount))
         self.stocks[stock] += amount
         self.cash -= amount * price
 
@@ -49,10 +50,12 @@ class Robot:
         # get bid price
         price = self.simulator.get_bid_price(stock)
 
-        while amount > self.stocks[stock]: amount -= 1
+        while amount > self.stocks[stock]:
+            amount -= 1
 
         # sell stocks
-        print("Selling {} shares of {} for {} each, total {}".format(amount, stock, price, price * amount))
+        if Config.is_debug_mode():
+            print("Selling {} shares of {} for {} each, total {}".format(amount, stock, price, price * amount))
         self.stocks[stock] -= amount
         self.cash += price * amount
 
@@ -99,7 +102,7 @@ class Robot:
         inputs = self.simulator.get_inputs()
         inputs += self.get_positions(stock_list)
         network = self.genome.generate_network()
-        outputs = network.evaluate(inputs, True)
+        outputs = network.evaluate(inputs, Config.is_debug_mode())
 
         for i, stock in enumerate(stock_list):
             if outputs[i] < 0:
