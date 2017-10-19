@@ -63,10 +63,13 @@ class Pool:
         for species in self.species:
             species.genomes.sort(key=lambda x: x.fitness, reverse=True)
             if cut_to_one:
-                species.genomes = [species.genomes[0]]
+                species.genomes = species.genomes[0:1]
                 return
             else:
-                species.genomes = species.genomes[0:int(math.ceil(len(species.genomes) / 2))]
+                cutoff = max(1,int(len(species.genomes) / 2))
+                for genome in species.genomes[cutoff:]:
+                    genome.status = 2
+                species.genomes = species.genomes[0:cutoff]
 
     def remove_stale(self):
         survived = []
@@ -80,6 +83,8 @@ class Pool:
 
             if species.staleness < self.max_staleness or species.top_fitness >= self.max_fitness:
                 survived.append(species)
+            else:
+                species.extinct()
 
         self.species = survived
 
@@ -91,6 +96,8 @@ class Pool:
             breed = math.floor(species.average_fitness / total * self.population)
             if breed >= 1:
                 survived.append(species)
+            else:
+                species.extinct()
 
         self.species = survived
 
@@ -168,6 +175,10 @@ class Species:
         child.mutator.mutate()
         return child
 
+    def extinct(self):
+        for genome in self.genomes:
+            genome.status = 2
+
 
 class Genome:
     DeltaDisjoint = config['POPULATION'].getfloat('delta_disjoint')
@@ -183,6 +194,7 @@ class Genome:
         self.output_size = Network.OutputSize
         self.max_neuron = 0
         self.global_rank = 0
+        self.status = 0
         self.network = None
         self.mutator = Mutator(self)
 

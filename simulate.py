@@ -115,10 +115,12 @@ class Simulator:
             self.pool.generation_stats()
             self.pool.new_generation()
             new_genomes = self.pool.all_genomes()
-            for i in range(len(self.robot_list)):
-                robot = self.robot_list[i]
+            self.robot_list = [robot for robot in self.robot_list if robot.is_alive()]
+            for robot in self.robot_list:
                 robot.reset()
-                robot.genome = new_genomes[i]
+            for i in range(len(new_genomes)):
+                if new_genomes[i].status == 0:
+                    self.add_robot(new_genomes[i], random.choice(self.names)+str(i))
 
         # ------------------------------------
         # Testing

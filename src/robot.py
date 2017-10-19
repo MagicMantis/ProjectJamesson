@@ -18,12 +18,12 @@ class Robot:
         self.cash = self.balance
         self.stocks = defaultdict(lambda: 0)
         self.genome = genome
+        self.genome.status = 1
 
     def reset(self):
         self.balance = self.original_balance
         self.cash = self.balance
         self.stocks = defaultdict(lambda: 0)
-        self.genome = None
 
     # buy as many shares of stock as can afford up to amount
     def buy(self, stock, amount):
@@ -109,3 +109,8 @@ class Robot:
                 self.sell(stock, 1)
             if outputs[i] > 0:
                 self.buy(stock, 1)
+
+    def is_alive(self):
+        if self.genome and self.genome.status == 1:
+            return True
+        return False
