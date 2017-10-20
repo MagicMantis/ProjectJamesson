@@ -19,11 +19,13 @@ class Robot:
         self.stocks = defaultdict(lambda: 0)
         self.genome = genome
         self.genome.status = 1
+        self.overbuy = 0
 
     def reset(self):
         self.balance = self.original_balance
         self.cash = self.balance
         self.stocks = defaultdict(lambda: 0)
+        self.overbuy = 0
 
     # buy as many shares of stock as can afford up to amount
     def buy(self, stock, amount):
@@ -31,15 +33,20 @@ class Robot:
         # get stock price
         price = self.simulator.get_ask_price(stock)
 
+        # calculate buy amount based on price
+        buy_cash = Decimal(amount) * self.balance
+        buy_amount = int(buy_cash / price)
+
         # determine total price and buyability
-        while amount * price > self.cash:
-            amount -= 1
+        while buy_amount > 0 and buy_amount * price > self.cash:
+            buy_amount -= 1
+            self.overbuy += 1
 
         # buy stocks
         if Config.is_debug_mode():
-            print("Buying {} shares of {} for {} each, total {}".format(amount, stock, price, price * amount))
-        self.stocks[stock] += amount
-        self.cash -= amount * price
+            print("Buying {} shares of {} for {} each, total {}".format(buy_amount, stock, price, price * buy_amount))
+        self.stocks[stock] += buy_amount
+        self.cash -= buy_amount * price
 
         # update balance
         self.update_balance()
@@ -50,14 +57,19 @@ class Robot:
         # get bid price
         price = self.simulator.get_bid_price(stock)
 
-        while amount > self.stocks[stock]:
-            amount -= 1
+        # calculate sell amount based on price and balance
+        sell_value = Decimal(amount) * self.balance
+        sell_amount = int(sell_value / price)
+
+        while sell_amount > 0 and sell_amount > self.stocks[stock]:
+            sell_amount -= 1
+            self.overbuy += 1
 
         # sell stocks
         if Config.is_debug_mode():
             print("Selling {} shares of {} for {} each, total {}".format(amount, stock, price, price * amount))
-        self.stocks[stock] -= amount
-        self.cash += price * amount
+        self.stocks[stock] -= sell_amount
+        self.cash += price * sell_amount
 
         # update balance
         self.update_balance()
@@ -81,8 +93,9 @@ class Robot:
 
         print("Name: ", self.name)
         print("Balance: ", self.balance)
-        print("Percent Change: ", self.calculate_change(), "%")
+        print("Percent Change: ", self.calculate_change()*100, "%")
         print("Cash: ", self.cash)
+        print("Overbuy: ", self.overbuy)
         for stock in self.stocks:
             print("\t{}: {}".format(stock, self.stocks[stock]))
 
@@ -104,11 +117,13 @@ class Robot:
         network = self.genome.generate_network()
         outputs = network.evaluate(inputs, Config.is_debug_mode())
 
+        self.update_balance()
+
         for i, stock in enumerate(stock_list):
             if outputs[i] < 0:
-                self.sell(stock, 1)
+                self.sell(stock, outputs[i])
             if outputs[i] > 0:
-                self.buy(stock, 1)
+                self.buy(stock, outputs[i])
 
     def is_alive(self):
         if self.genome and self.genome.status == 1:
