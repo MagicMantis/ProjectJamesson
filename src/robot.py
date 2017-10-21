@@ -43,7 +43,7 @@ class Robot:
             self.overbuy += 1
 
         # buy stocks
-        if Config.is_debug_mode():
+        if Config.is_debug_mode() and buy_amount != 0:
             print("Buying {} shares of {} for {} each, total {}".format(buy_amount, stock, price, price * buy_amount))
         self.stocks[stock] += buy_amount
         self.cash -= buy_amount * price
@@ -66,15 +66,15 @@ class Robot:
             self.overbuy += 1
 
         # sell stocks
-        if Config.is_debug_mode():
-            print("Selling {} shares of {} for {} each, total {}".format(amount, stock, price, price * amount))
+        if Config.is_debug_mode() and sell_amount != 0:
+            print("Selling {} shares of {} for {} each, total {}".format(sell_amount, stock, price, price * sell_amount))
         self.stocks[stock] -= sell_amount
         self.cash += price * sell_amount
 
         # update balance
         self.update_balance()
 
-    # recalcuate this robot's balance
+    # recalculate this robot's balance
     def update_balance(self):
 
         self.balance = self.cash
@@ -121,7 +121,7 @@ class Robot:
 
         for i, stock in enumerate(stock_list):
             if outputs[i] < 0:
-                self.sell(stock, outputs[i])
+                self.sell(stock, abs(outputs[i]))
             if outputs[i] > 0:
                 self.buy(stock, outputs[i])
 

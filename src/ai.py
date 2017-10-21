@@ -66,7 +66,7 @@ class Pool:
                 species.genomes = species.genomes[0:1]
                 return
             else:
-                cutoff = max(1,int(len(species.genomes) / 2))
+                cutoff = max(1, int(len(species.genomes) / 2))
                 for genome in species.genomes[cutoff:]:
                     genome.status = 2
                 species.genomes = species.genomes[0:cutoff]
@@ -113,9 +113,8 @@ class Pool:
         print("Max fitness: ", self.max_fitness)
         print("Avg fitness: ", sum(species.average_fitness for species in self.species) / len(self.species), "\n")
 
-
     def new_generation(self):
-        
+
         self.cull_species(False)
         for species in self.species:
             species.calculate_average_fitness()
@@ -503,10 +502,10 @@ class Network:
         for i, neuron in self.neurons.items():
             if i < self.genome.input_size:
                 continue
-            if debug: print(i, list(x.into for x in neuron.incoming))
-            val = sum(weight * node.value for weight,node in neuron.incoming)
-            if debug: print(list((x.into, self.neurons[x.into].value) for x in neuron.incoming))
-            if debug: print(list(x.weight for x in neuron.incoming))
+            if debug: print(neuron.incoming)
+            val = sum(weight * node.value for weight, node in neuron.incoming)
+            #if debug: print(list((x.into, self.neurons[x.into].value) for x in neuron.incoming))
+            #if debug: print(list(x.weight for x in neuron.incoming))
 
             neuron.value = self.sigmoid(val)
 
@@ -519,6 +518,7 @@ class Network:
 
     @staticmethod
     def sigmoid(x):
+        x = max(min(x, 1), -1)
         return 2 / (1 + math.exp(-4.9 * x)) - 1
 
 
