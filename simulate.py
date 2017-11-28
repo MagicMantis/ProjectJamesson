@@ -18,7 +18,7 @@ class Simulator:
 
         # Get date and time information
         today = date.today()
-        self.current_datetime = datetime(today.year, today.month, today.day-3, 9, 30)
+        self.current_datetime = datetime(today.year, today.month, 11, 9, 30)
         random.seed(datetime.now())
 
         # Load config file
@@ -124,7 +124,7 @@ class Simulator:
 
         # ------------------------------------
         # Testing
-        self.current_datetime = datetime(today.year, today.month, today.day-2, 9, 30)
+        self.current_datetime = datetime(today.year, today.month, 12, 9, 30)
         self.current_datetime -= timedelta(days=1)
         self.get_stock_data()
         self.current_datetime += timedelta(hours=1, minutes=5)
