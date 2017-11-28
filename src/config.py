@@ -2,6 +2,7 @@ import configparser
 import os
 from datetime import date
 
+
 class Config:
     config_parser = None
     debug_mode = False
@@ -25,9 +26,12 @@ class Config:
 
     @staticmethod
     def parse_training_dates():
-        dates = None
-        with open('/../res/training_dates.txt') as dates_file:
-            dates = dates_file.read_lines()
+        dates = []
+        with open(os.path.dirname(os.path.realpath(__file__))+'/../res/training_dates.txt', 'r') as dates_file:
+            dates = [Config.parse_date(ds) for ds in dates_file.readlines()]
+        return dates
 
     @staticmethod
-    def 
+    def parse_date(date_string):
+        return date(int(date_string.split('/')[2]), int(date_string.split('/')[0]), int(date_string.split('/')[1]))
+
